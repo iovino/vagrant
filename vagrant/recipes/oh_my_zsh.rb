@@ -1,5 +1,5 @@
 #
-# DIVUPS
+# Ken Iovino
 #
 # Copyright (c) 2011-2014, DIVUPS, LLC.
 #
