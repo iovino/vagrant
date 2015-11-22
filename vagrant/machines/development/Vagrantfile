@@ -1,0 +1,54 @@
+#
+# DIVUPS
+#
+# Copyright (c) 2011-2014, DIVUPS, LLC.
+#
+
+hostname  = "capify.com"
+
+Vagrant.configure("2") do |config|
+  config.omnibus.chef_version = :latest
+
+  config.berkshelf.enabled = true
+  config.berkshelf.berksfile_path = '../../Berksfile'
+
+  config.vm.box      = 'ubuntu/trusty64'
+  config.vm.box_url  = '../../aws.box'
+  config.vm.hostname = hostname
+
+  config.vm.synced_folder '../../../', '/var/www', group: 'www-data', mount_options: ['dmode=777,fmode=664']
+
+  config.vm.provider :aws do |aws, override|
+    aws.access_key_id             = 'AKIAJFWEO5G3O7RGBAMA'
+    aws.secret_access_key         = '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'
+    aws.keypair_name              = "capify"
+    aws.ami                       = 'ami-864d84ee'
+    aws.instance_type             = 't2.micro'
+    aws.region                    = "us-east-1"
+    override.ssh.username         = 'ubuntu'
+    override.ssh.private_key_path = '~/pem/capify.pem'
+  end
+
+  config.vm.provision :chef_solo do |chef|
+    chef.cookbooks_path = "../../../"
+    chef.json = {
+      'apache' => {
+        'docroot_dir' => '/var/www/public'
+      },
+      'oh_my_zsh' => {
+        'login' => 'ubuntu',
+        'theme' => 'blinks'
+      }
+    }
+    chef.run_list = [
+        "recipe[divups::default]",
+        "recipe[divups::apache]",
+        "recipe[divups::php]",
+        "recipe[divups::mysql]",
+        "recipe[divups::mailcatcher]",
+        "recipe[divups::nodejs]",
+        "recipe[divups::oh_my_zsh]",
+        "recipe[divups::cleanup]"
+    ]
+  end
+end

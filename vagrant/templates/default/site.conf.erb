@@ -1,0 +1,25 @@
+<VirtualHost *:80>
+  ServerAdmin <%= node['apache']['contact'] %>
+  DocumentRoot <%= node['apache']['docroot_dir'] %>
+
+  <Directory <%= node['apache']['docroot_dir'] %>>
+    Options FollowSymLinks
+    AllowOverride All
+    Order allow,deny
+    Allow from all
+  </Directory>
+
+  <Directory />
+    Options FollowSymLinks
+    AllowOverride All
+  </Directory>
+
+  <Location /server-status>
+    SetHandler server-status
+    Order Allow,Deny
+    Allow from all
+  </Location>
+
+  LogLevel info
+  ErrorLog <%= node['apache']['log_dir'] %>/<%= node['apache']['error_log'] %>
+</VirtualHost>
